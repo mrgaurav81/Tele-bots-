@@ -3,9 +3,10 @@ A collection of different telegram bots
 
 ## Affiliate Bot
 
-`affiliate_bot` contains a simple Telegram bot that analyses a product image
-using the [DeepAI](https://deepai.org) image recognition API and returns an
-Amazon search link with your affiliate tag.
+`affiliate_bot` contains a simple Telegram bot that can analyse a product image
+using the [DeepAI](https://deepai.org) image recognition API or accept a text
+description. In both cases it returns an Amazon search link with your affiliate
+tag.
 
 ### Setup
 
@@ -25,6 +26,7 @@ Amazon search link with your affiliate tag.
 python affiliate_bot/bot.py
 ```
 
-Send a photo of a product to the bot and it will reply with the first object
-caption detected by DeepAI and a corresponding Amazon search link that includes
-your affiliate tag.
+After starting the bot you can either send a photo of a product or type the
+product name. The bot will reply with an Amazon search link that includes your
+affiliate tag. If you send an image the caption detected by DeepAI will be used
+to build the search query.

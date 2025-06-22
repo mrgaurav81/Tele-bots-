@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 DEEPAI_API_URL = "https://api.deepai.org/api/densecap"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("Send me a product image and I'll try to find it on Amazon!")
+    await update.message.reply_text(
+        "Send me a product image or type the product name and I'll try to find it on Amazon!"
+    )
 
 
 def recognize_image(path: str, api_key: str):
@@ -78,6 +80,25 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text(f"I found: {keyword}\n{link}")
 
 
+async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    affiliate_tag = os.environ.get("AFFILIATE_TAG")
+    if not affiliate_tag:
+        await update.message.reply_text(
+            "Bot not configured properly. Missing affiliate tag."
+        )
+        return
+
+    keyword = update.message.text.strip()
+    if not keyword:
+        await update.message.reply_text("Please send some text describing a product.")
+        return
+
+    link = build_affiliate_link(keyword, affiliate_tag)
+    await update.message.reply_text(
+        f"Here are search results for '{keyword}':\n{link}"
+    )
+
+
 async def main() -> None:
     token = os.environ.get("TELEGRAM_TOKEN")
     if not token:
@@ -86,6 +107,9 @@ async def main() -> None:
     application = ApplicationBuilder().token(token).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    application.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text)
+    )
 
     logger.info("Bot started")
     await application.run_polling()
